@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JavaScript、CSS 與 SVG 網頁動畫技術文件</title>
+    <meta
+      name="description"
+      content="比較 JavaScript、CSS、SVG 製作網頁動畫的原理、差異、特色與實務應用。"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="回到頁首">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Web Animation Guide</span>
+      </a>
+      <nav aria-label="頁面導覽">
+        <a href="#principles">原理</a>
+        <a href="#compare">差異</a>
+        <a href="#strengths">強項</a>
+        <a href="#lab">示範</a>
+        <a href="#sources">來源</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">技術文件 · 2026-06-01</p>
+          <h1 id="hero-title">JavaScript、CSS、SVG 做網頁動畫時，各自在控制什麼？</h1>
+          <p>
+            CSS 擅長描述「樣式如何隨時間變化」，SVG 擅長描述「向量圖形如何變形或沿路徑運動」，
+            JavaScript 擅長描述「動畫如何回應資料、事件、物理與使用者狀態」。
+          </p>
+        </div>
+        <div class="hero-visual" aria-label="三種網頁動畫技術的視覺示意">
+          <div class="css-orbit" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <svg class="svg-wave" viewBox="0 0 360 220" role="img" aria-labelledby="svg-wave-title">
+            <title id="svg-wave-title">SVG 線條路徑與節點動畫</title>
+            <defs>
+              <linearGradient id="heroLine" x1="0" x2="1">
+                <stop offset="0" stop-color="#0f766e" />
+                <stop offset="0.55" stop-color="#2563eb" />
+                <stop offset="1" stop-color="#f97316" />
+              </linearGradient>
+            </defs>
+            <path
+              class="hero-path"
+              d="M28 146 C86 52 138 52 186 126 S278 204 332 78"
+              pathLength="100"
+            />
+            <circle class="path-dot" r="8">
+              <animateMotion dur="4.8s" repeatCount="indefinite" path="M28 146 C86 52 138 52 186 126 S278 204 332 78" />
+            </circle>
+            <g class="code-bars" aria-hidden="true">
+              <rect x="42" y="182" width="54" height="10" rx="5" />
+              <rect x="112" y="182" width="86" height="10" rx="5" />
+              <rect x="214" y="182" width="68" height="10" rx="5" />
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <section class="section intro-grid" aria-label="快速結論">
+        <article>
+          <h2>一句話區分</h2>
+          <p>
+            CSS 是樣式時間軸，SVG 是向量圖形語言，JavaScript 是程式控制層。實務上它們常被混用：
+            用 SVG 畫精準圖形，用 CSS 做轉場，用 JavaScript 控制狀態與互動。
+          </p>
+        </article>
+        <article>
+          <h2>選型優先順序</h2>
+          <p>
+            先問動畫是否只改外觀。若是，優先 CSS。若圖形本身很重要，優先 SVG。
+            若需要讀取資料、即時互動、遊戲或物理計算，再用 JavaScript。
+          </p>
+        </article>
+      </section>
+
+      <section id="principles" class="section" aria-labelledby="principles-title">
+        <div class="section-heading">
+          <p class="eyebrow">01 · Rendering Model</p>
+          <h2 id="principles-title">動畫原理</h2>
+        </div>
+        <div class="principle-list">
+          <article class="principle-card css-card">
+            <div class="tech-icon">CSS</div>
+            <h3>CSS：宣告式關鍵影格</h3>
+            <p>
+              透過 `@keyframes`、`animation`、`transition` 宣告元素屬性在時間軸上的變化。
+              瀏覽器可自行排程，常見的 `transform` 與 `opacity` 動畫能避開昂貴的版面重排。
+            </p>
+            <ul>
+              <li>適合 hover、開合、載入狀態、頁面微互動。</li>
+              <li>程式邏輯少，維護成本低。</li>
+              <li>不擅長複雜條件、碰撞偵測、資料驅動流程。</li>
+            </ul>
+          </article>
+          <article class="principle-card svg-card">
+            <div class="tech-icon">SVG</div>
+            <h3>SVG：向量圖形與圖形 DOM</h3>
+            <p>
+              SVG 用 XML 元素描述線、圓、路徑、遮罩、漸層等向量圖形。動畫可用 CSS、SMIL
+              動畫元素，或 JavaScript 操作 SVG DOM。
+            </p>
+            <ul>
+              <li>縮放不失真，適合圖示、圖解、資料視覺化。</li>
+              <li>可針對路徑、節點、描邊、遮罩做細緻動畫。</li>
+              <li>大量複雜節點可能造成 DOM 成本。</li>
+            </ul>
+          </article>
+          <article class="principle-card js-card">
+            <div class="tech-icon">JS</div>
+            <h3>JavaScript：逐幀計算與 API 控制</h3>
+            <p>
+              JavaScript 可用 `requestAnimationFrame()` 在瀏覽器重繪前更新狀態，也可用 Web
+              Animations API 取得與控制動畫物件，例如暫停、調速、同步多個動畫。
+            </p>
+            <ul>
+              <li>適合互動模擬、遊戲、圖表、資料驅動動畫。</li>
+              <li>可整合事件、時間、速度、物理與遠端資料。</li>
+              <li>若每幀做太多 DOM 或 layout 操作，效能容易下降。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="compare" class="section" aria-labelledby="compare-title">
+        <div class="section-heading">
+          <p class="eyebrow">02 · Comparison</p>
+          <h2 id="compare-title">差異比較</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>面向</th>
+                <th>CSS 動畫</th>
+                <th>SVG 動畫</th>
+                <th>JavaScript 動畫</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>核心語意</th>
+                <td>樣式屬性隨時間改變</td>
+                <td>向量圖形、路徑、描邊與形狀變化</td>
+                <td>程式根據狀態逐幀更新</td>
+              </tr>
+              <tr>
+                <th>控制方式</th>
+                <td>宣告式，瀏覽器排程</td>
+                <td>宣告式或 DOM 操作</td>
+                <td>命令式或透過 Web Animations API</td>
+              </tr>
+              <tr>
+                <th>互動能力</th>
+                <td>適合簡單狀態與媒體查詢</td>
+                <td>可對圖形元素加事件與樣式</td>
+                <td>最強，可讀資料、事件、感測與時間</td>
+              </tr>
+              <tr>
+                <th>效能重點</th>
+                <td>優先 animating `transform`、`opacity`</td>
+                <td>控制節點數，避免過度複雜濾鏡</td>
+                <td>減少每幀 DOM 讀寫，批次更新</td>
+              </tr>
+              <tr>
+                <th>典型用途</th>
+                <td>按鈕、卡片、選單、loading、頁面轉場</td>
+                <td>logo、icon、流程圖、科學圖解、資料視覺化</td>
+                <td>遊戲、模擬器、互動圖表、滾動敘事</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="strengths" class="section" aria-labelledby="strengths-title">
+        <div class="section-heading">
+          <p class="eyebrow">03 · Design Roles</p>
+          <h2 id="strengths-title">在網頁設計中的強項</h2>
+        </div>
+        <div class="role-grid">
+          <article>
+            <h3>介面層：CSS 最強</h3>
+            <p>
+              元件 hover、focus、active、enter/exit transition、RWD 狀態切換都適合 CSS。
+              它讓互動回饋靠近樣式系統，設計一致性最好維護。
+            </p>
+          </article>
+          <article>
+            <h3>圖形層：SVG 最強</h3>
+            <p>
+              需要清楚呈現圖形結構時，SVG 比 bitmap 更適合。像流程箭頭、結構示意、
+              曲線、節點、遮罩與描邊動畫，都能保留語意與可縮放性。
+            </p>
+          </article>
+          <article>
+            <h3>行為層：JavaScript 最強</h3>
+            <p>
+              當動畫必須跟使用者輸入、資料、時間差、物理量或多個元件同步時，
+              JavaScript 是控制中心。CSS 與 SVG 可負責呈現，JS 負責決策。
+            </p>
+          </article>
+          <article>
+            <h3>混合層：實務最常見</h3>
+            <p>
+              例如互動式教材可用 SVG 畫科學圖形，用 CSS 做狀態轉場，用 JavaScript
+              根據滑桿、測驗或模擬數值更新畫面。
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="lab" class="section lab-section" aria-labelledby="lab-title">
+        <div class="section-heading">
+          <p class="eyebrow">04 · Live Lab</p>
+          <h2 id="lab-title">三種動畫的實作示範</h2>
+        </div>
+        <div class="lab-grid">
+          <article class="demo-panel">
+            <h3>CSS keyframes</h3>
+            <div class="demo-stage css-demo" aria-label="CSS 動畫示範">
+              <div class="pulse-box"></div>
+            </div>
+            <pre><code>@keyframes float {
+  to { transform: translateY(-42px) rotate(10deg); }
+}</code></pre>
+          </article>
+
+          <article class="demo-panel">
+            <h3>SVG path + SMIL</h3>
+            <div class="demo-stage" aria-label="SVG 動畫示範">
+              <svg class="mini-svg" viewBox="0 0 280 150" role="img" aria-label="圓點沿著曲線移動">
+                <path d="M24 105 C76 18 132 128 188 42 S252 68 258 116" pathLength="100" />
+                <circle r="7">
+                  <animateMotion dur="3.2s" repeatCount="indefinite" path="M24 105 C76 18 132 128 188 42 S252 68 258 116" />
+                </circle>
+              </svg>
+            </div>
+            <pre><code>&lt;animateMotion path="M24 105 C76 18..." /&gt;</code></pre>
+          </article>
+
+          <article class="demo-panel">
+            <h3>JavaScript requestAnimationFrame</h3>
+            <div class="demo-stage js-demo" aria-label="JavaScript 動畫示範">
+              <canvas id="rafCanvas" width="420" height="220"></canvas>
+            </div>
+            <div class="demo-controls">
+              <button id="toggleRaf" type="button">暫停</button>
+              <label>
+                速度
+                <input id="speedControl" type="range" min="0.4" max="2.4" value="1" step="0.1" />
+              </label>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section decision" aria-labelledby="decision-title">
+        <div class="section-heading">
+          <p class="eyebrow">05 · Decision Guide</p>
+          <h2 id="decision-title">實務選擇建議</h2>
+        </div>
+        <ol class="decision-list">
+          <li><strong>只改視覺狀態：</strong>用 CSS transition 或 keyframes。</li>
+          <li><strong>需要清楚、可縮放的圖形：</strong>用 SVG 畫，再用 CSS 或 SVG 動畫。</li>
+          <li><strong>需要根據資料或輸入即時變化：</strong>用 JavaScript 控制，必要時搭配 Canvas、SVG 或 Web Animations API。</li>
+          <li><strong>需要可維護：</strong>把「畫什麼」與「何時變化」分開。SVG/CSS 負責呈現，JavaScript 負責狀態。</li>
+        </ol>
+      </section>
+
+      <section id="sources" class="section sources" aria-labelledby="sources-title">
+        <div class="section-heading">
+          <p class="eyebrow">References</p>
+          <h2 id="sources-title">查證與延伸閱讀</h2>
+        </div>
+        <ul>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations">MDN：CSS animations</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations">MDN：Using CSS animations</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/SVG">MDN：SVG: Scalable Vector Graphics</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Guides/SVG_animation_with_SMIL">MDN：SVG animation with SMIL</a></li>
+          <li><a href="https://developer.mozilla.org/docs/Web/API/window/requestAnimationFrame">MDN：Window.requestAnimationFrame()</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API">MDN：Web Animations API</a></li>
+          <li><a href="https://www.w3.org/TR/css-animations-1/">W3C：CSS Animations Level 1</a></li>
+          <li><a href="https://www.w3.org/TR/web-animations-1/">W3C：Web Animations</a></li>
+          <li><a href="https://www.w3.org/TR/SVG/">W3C：Scalable Vector Graphics (SVG) 2</a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>本文件整理自官方技術文件，適合作為網頁設計與互動教材開發的技術參考。</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
