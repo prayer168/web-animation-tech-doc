@@ -22,6 +22,7 @@ html {
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent 360px),
     var(--paper);
@@ -30,6 +31,24 @@ body {
     "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   line-height: 1.7;
+}
+
+main,
+section,
+article,
+table,
+pre {
+  max-width: 100%;
+}
+
+p,
+li,
+h1,
+h2,
+h3,
+a,
+code {
+  overflow-wrap: break-word;
 }
 
 a {
@@ -288,7 +307,9 @@ nav a:focus-visible {
 }
 
 .table-wrap {
+  position: relative;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
@@ -547,14 +568,32 @@ footer {
     position: static;
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
+    padding-inline: 18px;
   }
 
   nav {
+    width: 100%;
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  nav a {
+    flex: 0 0 auto;
+    padding-inline: 12px;
   }
 
   .hero {
     padding-top: 28px;
+    padding-inline: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 11vw, 3rem);
+    line-height: 1.12;
   }
 
   .hero-visual {
@@ -569,6 +608,45 @@ footer {
   .role-grid,
   .sources ul {
     grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding-inline: 18px;
+  }
+
+  .table-wrap {
+    margin-inline: -2px;
+  }
+
+  .table-wrap::before {
+    content: "左右滑動看完整比較";
+    position: sticky;
+    left: 0;
+    display: block;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 0.86rem;
+    font-weight: 800;
+  }
+
+  table {
+    min-width: 680px;
+  }
+
+  th,
+  td {
+    padding: 13px 14px;
+  }
+
+  tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 124px;
+    background: inherit;
+    box-shadow: 1px 0 0 var(--line);
   }
 
   .demo-controls {
